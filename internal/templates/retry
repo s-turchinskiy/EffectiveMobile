@@ -1,0 +1,57 @@
+import(
+  commonerrors "github.com/s-turchinskiy/EffectiveMobile/internal/common/errors"
+  "time"
+)
+
+{{ $decorator := (or .Vars.DecoratorName (printf "%sWithRetry" .Interface.Name)) }}
+
+// {{$decorator}} implements {{.Interface.Type}} interface instrumented with retries
+type {{$decorator}} struct {
+  {{.Interface.Type}}
+  _retryInterval []time.Duration
+}
+
+// New{{$decorator}} returns {{$decorator}}
+func New{{$decorator}} (base {{.Interface.Type}}, retryInterval []time.Duration) {{$decorator}} {
+  return {{$decorator}} {
+    {{.Interface.Name}}: base,
+    _retryInterval: retryInterval,
+  }
+}
+
+{{range $method := .Interface.Methods}}
+  {{if $method.ReturnsError}}
+    // {{$method.Name}} implements {{$.Interface.Type}}
+    func (_d {{$decorator}}) {{$method.Declaration}} {
+
+      if _d._retryInterval == nil || len(_d._retryInterval) == 0 {
+        {{$method.ResultsNames}} = _d.{{$.Interface.Name}}.{{$method.Call}}
+        return
+      }
+
+      for _, delay := range _d._retryInterval {
+        {{- if $method.AcceptsContext}}
+          select {
+          case <-ctx.Done():
+            return
+          default:
+            time.Sleep(delay)
+            {{$method.ResultsNames}} = _d.{{$.Interface.Name}}.{{$method.Call}}
+            if err == nil || !commonerrors.IsConnectionError(err) {
+                return
+            }
+          }
+        {{else}}
+          for _, delay := range _d.retryStrategy {
+          		time.Sleep(delay)
+          		 {{$method.ResultsNames}} = _d.{{$.Interface.Name}}.{{$method.Call}}
+          		 if err == nil || !commonerrors.IsConnectionError(err) {
+                    return
+                 }
+          	}
+        {{end -}}
+      }
+      return
+    }
+  {{end}}
+{{end}}

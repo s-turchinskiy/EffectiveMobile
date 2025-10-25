@@ -6,7 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/joho/godotenv"
-	config2 "github.com/s-turchinskiy/EffectiveMobile/cmd/subscriptions/config"
+	pubconfig "github.com/s-turchinskiy/EffectiveMobile/cmd/subscriptions/config"
 	"github.com/s-turchinskiy/EffectiveMobile/internal/common/closer"
 	"github.com/s-turchinskiy/EffectiveMobile/internal/handlers"
 	"github.com/s-turchinskiy/EffectiveMobile/internal/middleware/logger"
@@ -23,12 +23,12 @@ var outputPathsLogs string
 
 func init() {
 
-	err := config2.InitializePublicConfig()
+	err := pubconfig.InitializePublicConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	flag.StringVar(&outputPathsLogs, "logs", config2.PublicConfig.OutputPathsLogsDefault, "Paths to output (file, stdout) logs")
+	flag.StringVar(&outputPathsLogs, "logs", pubconfig.PublicConfig.OutputPathsLogsDefault, "Paths to output (file, stdout) logs")
 	flag.Parse()
 
 	if err := logger.Initialize(outputPathsLogs); err != nil {
@@ -49,12 +49,12 @@ func main() {
 
 	doneCh := make(chan struct{})
 
-	err := godotenv.Load(config2.PublicConfig.EnvFilename)
+	err := godotenv.Load(pubconfig.PublicConfig.EnvFilename)
 	if err != nil {
 		logger.Log.Debugw("Error loading .env file", "error", err.Error())
 	}
 
-	configData, err := config2.GetConfig()
+	configData, err := pubconfig.GetConfig()
 	if err != nil {
 		logger.Log.Errorw("Get Settings error", "error", err.Error())
 		errorsCh <- err
@@ -66,7 +66,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//rep = repository.NewRepositoryWithRetry(rep, config.PublicConfig.HTTPServer.RetryStrategy)
+	rep = repository.NewRepositoryWithRetry(rep, pubconfig.PublicConfig.HTTPServer.RetryStrategy)
 	closer.Add(rep.Close)
 
 	httpServer := getHTTPServer(ctx, rep, configData.Address.String())
@@ -88,15 +88,15 @@ func getHTTPServer(ctx context.Context, repository repository.Repository, addr s
 	handler := handlers.NewHandler(
 		ctx,
 		repository,
-		config2.PublicConfig.HTTPServer.RetryStrategy)
+		pubconfig.PublicConfig.HTTPServer.RetryStrategy)
 
 	router := handlers.Router(handler)
 
 	server := &http.Server{
 		Addr:         addr,
 		Handler:      router,
-		ReadTimeout:  config2.PublicConfig.HTTPServer.ReadTimeout,
-		WriteTimeout: config2.PublicConfig.HTTPServer.WriteTimeout,
+		ReadTimeout:  pubconfig.PublicConfig.HTTPServer.ReadTimeout,
+		WriteTimeout: pubconfig.PublicConfig.HTTPServer.WriteTimeout,
 	}
 
 	return server
@@ -134,7 +134,7 @@ func shutdown(closer *closer.Closer, doneCh chan struct{}) error {
 
 	close(doneCh)
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), config2.PublicConfig.ShutdownTimeout)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), pubconfig.PublicConfig.ShutdownTimeout)
 	defer cancel()
 
 	if err := closer.Close(shutdownCtx); err != nil {
