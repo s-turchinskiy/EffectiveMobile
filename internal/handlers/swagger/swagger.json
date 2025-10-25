@@ -1,0 +1,361 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Сервис хранения подписок.",
+        "title": "Subscriptions API",
+        "contact": {
+            "email": "s.turchinskiy@yandex.ru"
+        },
+        "version": "1.0"
+    },
+    "host": "nohost.io:8080",
+    "basePath": "/",
+    "paths": {
+        "/subscription/create": {
+            "post": {
+                "description": "Создание новой подписки на основе данных json",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Создание новой подписки",
+                "operationId": "subscriptionCreateSubscription",
+                "parameters": [
+                    {
+                        "description": "Содержимое подписки",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateSubscriptionJSON"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscription/delete{Id}": {
+            "delete": {
+                "description": "Удаление подписки по ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Удаление подписки",
+                "operationId": "subscriptionDeleteSubscription",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Id",
+                        "name": "Id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ОК",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscription/read": {
+            "get": {
+                "description": "Чтение всех существующих подписок",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Чтение подписок",
+                "operationId": "subscriptionReadSubscriptions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ReadSubscriptionJSON"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscription/sum": {
+            "post": {
+                "description": "Суммарная стоимость всех подписок за выбранный период с фильтрацией по id пользователя и названию подписки",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Сумма подписок",
+                "operationId": "subscriptionsSumSubscriptions",
+                "parameters": [
+                    {
+                        "description": "Фильтры",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SumSubscriptionsJSON"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscription/update": {
+            "put": {
+                "description": "Обновление существующей подписки на основе данных json",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Обновление подписки",
+                "operationId": "subscriptionUpdateSubscription",
+                "parameters": [
+                    {
+                        "description": "Содержимое подписки",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateSubscriptionJSON"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.CreateSubscriptionJSON": {
+            "type": "object",
+            "required": [
+                "price",
+                "service_name",
+                "start_date",
+                "user_id"
+            ],
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "08-2025"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "service_name": {
+                    "type": "string",
+                    "example": "Yandex Plus"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "07-2025"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "60601fee-2bf1-4721-ae6f-7636e79a0cba"
+                }
+            }
+        },
+        "models.ReadSubscriptionJSON": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "08-2025"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "service_name": {
+                    "type": "string",
+                    "example": "Yandex Plus"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "07-2025"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "60601fee-2bf1-4721-ae6f-7636e79a0cba"
+                }
+            }
+        },
+        "models.SumSubscriptionsJSON": {
+            "type": "object",
+            "required": [
+                "period"
+            ],
+            "properties": {
+                "period": {
+                    "type": "string",
+                    "example": "07-2025"
+                },
+                "service_name": {
+                    "type": "string",
+                    "example": "Yandex Plus"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "60601fee-2bf1-4721-ae6f-7636e79a0cba"
+                }
+            }
+        },
+        "models.UpdateSubscriptionJSON": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "08-2025"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "service_name": {
+                    "type": "string",
+                    "example": "Yandex Plus"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "07-2025"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "60601fee-2bf1-4721-ae6f-7636e79a0cba"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "description": "\"Взаимодействие с подпиской\"",
+            "name": "Subscription"
+        },
+        {
+            "description": "\"Отчеты по подпискам\"",
+            "name": "Subscriptions"
+        }
+    ]
+}
